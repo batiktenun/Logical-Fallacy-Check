@@ -1,10 +1,9 @@
-
 <!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pemeriksa Kesesatan Logika</title>
+    <title>Pemeriksa Kesesatan Logika - Website & Teks</title>
     <style>
         * {
             box-sizing: border-box;
@@ -22,7 +21,7 @@
         }
 
         .container {
-            max-width: 800px;
+            max-width: 1000px;
             margin: 0 auto;
             background: white;
             border-radius: 15px;
@@ -57,13 +56,37 @@
             margin-top: 15px;
         }
 
-        .input-section {
+        .tab-container {
+            display: flex;
+            background: #34495e;
+        }
+
+        .tab {
+            padding: 15px 20px;
+            color: white;
+            cursor: pointer;
+            flex: 1;
+            text-align: center;
+            transition: background 0.3s;
+        }
+
+        .tab.active {
+            background: #3498db;
+            font-weight: bold;
+        }
+
+        .tab-content {
+            display: none;
             padding: 25px;
+        }
+
+        .tab-content.active {
+            display: block;
         }
 
         textarea {
             width: 100%;
-            height: 150px;
+            height: 200px;
             padding: 15px;
             border: 2px solid #ddd;
             border-radius: 8px;
@@ -73,6 +96,21 @@
         }
 
         textarea:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+
+        input[type="url"] {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            margin-bottom: 15px;
+            transition: border-color 0.3s;
+        }
+
+        input[type="url"]:focus {
             outline: none;
             border-color: #3498db;
         }
@@ -97,6 +135,17 @@
 
         button:active {
             transform: translateY(0);
+        }
+
+        button:disabled {
+            background: #95a5a6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
         }
 
         .results-section {
@@ -151,6 +200,47 @@
             margin-bottom: 15px;
         }
 
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #3498db;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 2s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .website-preview {
+            background: #f8f9fa;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 20px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .website-preview h3 {
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+
+        .extracted-text {
+            line-height: 1.5;
+            color: #555;
+        }
+
         footer {
             text-align: center;
             padding: 20px;
@@ -168,34 +258,66 @@
             margin-bottom: 15px;
             font-size: 0.9rem;
         }
+
+        .warning-box {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
             <h1>🔍 Pemeriksa Kesesatan Logika</h1>
-            <p class="subtitle">Analisis argumen atau pernyataan untuk mendeteksi kesalahan penalaran</p>
+            <p class="subtitle">Analisis argumen dari teks langsung atau website berita</p>
             <div class="disclaimer">
                 ⚠️ Catatan: Aplikasi ini menggunakan deteksi berbasis kata kunci dan tidak 100% akurat. Hasil hanya sebagai panduan.
             </div>
         </header>
 
-        <section class="input-section">
-            <label for="userArgument">
-                <h2>Masukkan argumen atau pernyataan:</h2>
-            </label>
+        <div class="tab-container">
+            <div class="tab active" onclick="switchTab('text-tab')">Analisis Teks</div>
+            <div class="tab" onclick="switchTab('website-tab')">Analisis Website</div>
+        </div>
+
+        <section id="text-tab" class="tab-content active">
+            <h2>Analisis Teks Langsung</h2>
+            <div class="info-box">
+                Masukkan teks argumen atau pernyataan yang ingin Anda analisis di bawah ini.
+            </div>
             <textarea id="userArgument" placeholder="Contoh: Kamu tidak bisa mempercayai pendapatnya tentang ekonomi karena dia bukan lulusan sarjana..."></textarea>
-            <button onclick="analyzeArgument()">Analisis Sekarang</button>
-            <button onclick="clearText()" style="background: #95a5a6; margin-left: 10px;">Hapus Teks</button>
+            <div class="button-group">
+                <button onclick="analyzeArgument()">Analisis Sekarang</button>
+                <button onclick="clearText()" style="background: #95a5a6;">Hapus Teks</button>
+            </div>
+        </section>
+
+        <section id="website-tab" class="tab-content">
+            <h2>Analisis Konten Website</h2>
+            <div class="warning-box">
+                ⚠️ Fitur ini membutuhkan CORS Proxy dan mungkin tidak bekerja untuk semua website karena kebijakan keamanan.
+            </div>
+            <input type="url" id="urlInput" placeholder="Masukkan URL website (contoh: https://example.com/artikel)">
+            <div class="button-group">
+                <button onclick="analyzeWebsite()">Ambil & Analisis Konten</button>
+                <button onclick="clearWebsite()" style="background: #95a5a6;">Reset</button>
+            </div>
+            
+            <div id="website-preview" class="website-preview" style="display: none;">
+                <h3>Konten yang Diambil:</h3>
+                <div id="extracted-content" class="extracted-text"></div>
+            </div>
         </section>
 
         <section class="results-section">
             <h2>Hasil Analisis</h2>
-            <div class="info-box">
-                Aplikasi ini memeriksa 10 jenis kesesatan logika umum. Hasil akan muncul di bawah.
-            </div>
             <div id="results" class="results-container">
-                <div class="no-fallacy">Masukkan teks dan klik "Analisis Sekarang" untuk memulai</div>
+                <div class="no-fallacy">Pilih metode analisis dan masukkan konten untuk memulai</div>
             </div>
         </section>
     </div>
@@ -269,6 +391,30 @@
             }
         ];
 
+        // Tab switching function
+        function switchTab(tabId) {
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Remove active class from all tabs
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected tab content
+            document.getElementById(tabId).classList.add('active');
+            
+            // Add active class to clicked tab
+            event.target.classList.add('active');
+            
+            // Clear results when switching tabs
+            document.getElementById('results').innerHTML = 
+                '<div class="no-fallacy">Pilih metode analisis dan masukkan konten untuk memulai</div>';
+        }
+
+        // Function to check for fallacies in text
         function checkForFallacies(text) {
             const detectedFallacies = [];
             const lowerCaseText = text.toLowerCase();
@@ -278,7 +424,7 @@
                     lowerCaseText.includes(keyword.toLowerCase())
                 );
 
-                // Juga cek dengan regex untuk pola tertentu
+                // Also check with regex for specific patterns
                 let regexPatterns = [];
                 
                 if (fallacy.name === "Straw Man") {
@@ -297,7 +443,7 @@
                 const hasRegexMatch = regexPatterns.some(pattern => pattern.test(lowerCaseText));
 
                 if (hasKeyword || hasRegexMatch) {
-                    // Hitung skor kecocokan (sederhana)
+                    // Calculate matching score (simple)
                     let score = 0;
                     fallacy.keywords.forEach(keyword => {
                         const regex = new RegExp(keyword, 'gi');
@@ -314,12 +460,13 @@
                 }
             });
 
-            // Urutkan berdasarkan skor tertinggi
+            // Sort by highest score
             detectedFallacies.sort((a, b) => b.score - a.score);
             
             return detectedFallacies;
         }
 
+        // Function to analyze text argument
         function analyzeArgument() {
             const userInput = document.getElementById('userArgument').value;
             const resultsContainer = document.getElementById('results');
@@ -329,18 +476,134 @@
                 return;
             }
 
-            const detected = checkForFallacies(userInput);
+            showLoading();
+            
+            // Simulate processing time
+            setTimeout(() => {
+                const detected = checkForFallacies(userInput);
+                displayResults(detected, userInput);
+            }, 800);
+        }
 
-            resultsContainer.innerHTML = '';
+        // Function to analyze website content
+        async function analyzeWebsite() {
+            const url = document.getElementById('urlInput').value;
+            const resultsContainer = document.getElementById('results');
+            const previewContainer = document.getElementById('website-preview');
+            const extractedContent = document.getElementById('extracted-content');
+
+            if (!url.trim()) {
+                resultsContainer.innerHTML = '<div class="no-fallacy" style="color:#e74c3c;">Silakan masukkan URL website terlebih dahulu!</div>';
+                return;
+            }
+
+            showLoading("Mengambil konten dari website...");
+
+            try {
+                // Use a CORS proxy to bypass CORS restrictions
+                // Note: This is a public proxy - in production, you should use your own
+                const proxyUrl = 'https://api.allorigins.win/raw?url=';
+                const targetUrl = encodeURIComponent(url);
+                
+                const response = await fetch(proxyUrl + targetUrl);
+                
+                if (!response.ok) {
+                    throw new Error(`Gagal mengambil konten: ${response.status} ${response.statusText}`);
+                }
+                
+                const html = await response.text();
+                
+                // Extract text content from HTML
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+                
+                // Remove script and style elements
+                const scripts = doc.querySelectorAll('script, style, nav, header, footer');
+                scripts.forEach(element => element.remove());
+                
+                // Try to get the main content
+                // First try article tag, then main, then body
+                let contentElement = doc.querySelector('article') || 
+                                   doc.querySelector('main') || 
+                                   doc.querySelector('.content, .article, .post') || 
+                                   doc.body;
+                
+                let textContent = contentElement.innerText || contentElement.textContent;
+                
+                // Clean up the text
+                textContent = textContent
+                    .replace(/\s+/g, ' ')
+                    .replace(/\n+/g, '\n')
+                    .trim();
+                
+                // Limit text length for performance
+                const maxLength = 10000;
+                if (textContent.length > maxLength) {
+                    textContent = textContent.substring(0, maxLength) + '... [konten dipotong]';
+                }
+                
+                // Show preview
+                extractedContent.textContent = textContent;
+                previewContainer.style.display = 'block';
+                
+                // Analyze the extracted text
+                showLoading("Menganalisis konten website...");
+                
+                setTimeout(() => {
+                    const detected = checkForFallacies(textContent);
+                    displayResults(detected, textContent, `Konten dari: ${url}`);
+                }, 1000);
+                
+            } catch (error) {
+                resultsContainer.innerHTML = `
+                    <div class="no-fallacy" style="color:#e74c3c;">
+                        Gagal mengambil konten website: ${error.message}<br><br>
+                        <small>Ini mungkin karena:<br>
+                        - Website memblokir akses melalui CORS<br>
+                        - Koneksi internet bermasalah<br>
+                        - URL tidak valid</small>
+                    </div>`;
+            }
+        }
+
+        // Function to display loading state
+        function showLoading(message = "Menganalisis konten...") {
+            const resultsContainer = document.getElementById('results');
+            resultsContainer.innerHTML = `
+                <div class="loading">
+                    <div class="spinner"></div>
+                    ${message}
+                </div>`;
+        }
+
+        // Function to display results
+        function displayResults(detected, originalText, source = "Teks yang dianalisis") {
+            const resultsContainer = document.getElementById('results');
+            
+            // Show source info
+            let sourceInfo = '';
+            if (source) {
+                const textPreview = originalText.length > 200 ? 
+                    originalText.substring(0, 200) + '...' : originalText;
+                sourceInfo = `
+                    <div class="info-box">
+                        <strong>Sumber:</strong> ${source}<br>
+                        <strong>Preview:</strong> "${textPreview}"
+                    </div>
+                `;
+            }
 
             if (detected.length === 0) {
                 resultsContainer.innerHTML = `
+                    ${sourceInfo}
                     <div class="no-fallacy">
                         ✅ Tidak terdeteksi pola fallacy yang jelas.<br><br>
                         <small>Namun, ini tidak menjamin argumen tersebut valid. Periksa konteks dan struktur logika secara manual.</small>
                     </div>`;
             } else {
-                resultsContainer.innerHTML = `<div class="fallacy-count">Ditemukan ${detected.length} kemungkinan kesesatan logika</div>`;
+                resultsContainer.innerHTML = `
+                    ${sourceInfo}
+                    <div class="fallacy-count">Ditemukan ${detected.length} kemungkinan kesesatan logika</div>`;
                 
                 detected.forEach(fallacy => {
                     const confidence = fallacy.score > 3 ? "Tinggi" : fallacy.score > 1 ? "Sedang" : "Rendah";
@@ -357,15 +620,30 @@
             }
         }
 
+        // Function to clear text
         function clearText() {
             document.getElementById('userArgument').value = '';
             document.getElementById('results').innerHTML = '<div class="no-fallacy">Masukkan teks dan klik "Analisis Sekarang" untuk memulai</div>';
         }
 
-        // Tambahkan event listener untuk Enter key
+        // Function to clear website input
+        function clearWebsite() {
+            document.getElementById('urlInput').value = '';
+            document.getElementById('website-preview').style.display = 'none';
+            document.getElementById('results').innerHTML = '<div class="no-fallacy">Masukkan URL website dan klik "Ambil & Analisis Konten" untuk memulai</div>';
+        }
+
+        // Add event listener for Enter key in textarea
         document.getElementById('userArgument').addEventListener('keypress', function(e) {
             if (e.key === 'Enter' && e.ctrlKey) {
                 analyzeArgument();
+            }
+        });
+
+        // Add event listener for Enter key in URL input
+        document.getElementById('urlInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                analyzeWebsite();
             }
         });
     </script>
