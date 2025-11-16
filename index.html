@@ -1,1 +1,373 @@
 
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pemeriksa Kesesatan Logika</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+
+        header {
+            background: #2c3e50;
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            opacity: 0.8;
+            margin-bottom: 15px;
+        }
+
+        .disclaimer {
+            background: #e74c3c;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            margin-top: 15px;
+        }
+
+        .input-section {
+            padding: 25px;
+        }
+
+        textarea {
+            width: 100%;
+            height: 150px;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            resize: vertical;
+            transition: border-color 0.3s;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+
+        button {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: bold;
+            margin-top: 15px;
+            transition: background 0.3s, transform 0.2s;
+        }
+
+        button:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .results-section {
+            padding: 0 25px 25px;
+        }
+
+        .results-container {
+            margin-top: 20px;
+        }
+
+        .fallacy-item {
+            background: #f8f9fa;
+            border-left: 5px solid #3498db;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .fallacy-name {
+            color: #2c3e50;
+            font-size: 1.3rem;
+            margin-bottom: 8px;
+        }
+
+        .fallacy-desc {
+            color: #555;
+            margin-bottom: 8px;
+        }
+
+        .fallacy-example {
+            background: #e8f4fc;
+            padding: 10px;
+            border-radius: 5px;
+            font-style: italic;
+            margin-top: 8px;
+        }
+
+        .no-fallacy {
+            text-align: center;
+            padding: 20px;
+            color: #27ae60;
+            font-weight: bold;
+        }
+
+        .fallacy-count {
+            background: #34495e;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            display: inline-block;
+            margin-bottom: 15px;
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            color: white;
+            margin-top: 20px;
+            font-size: 0.9rem;
+        }
+
+        .info-box {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🔍 Pemeriksa Kesesatan Logika</h1>
+            <p class="subtitle">Analisis argumen atau pernyataan untuk mendeteksi kesalahan penalaran</p>
+            <div class="disclaimer">
+                ⚠️ Catatan: Aplikasi ini menggunakan deteksi berbasis kata kunci dan tidak 100% akurat. Hasil hanya sebagai panduan.
+            </div>
+        </header>
+
+        <section class="input-section">
+            <label for="userArgument">
+                <h2>Masukkan argumen atau pernyataan:</h2>
+            </label>
+            <textarea id="userArgument" placeholder="Contoh: Kamu tidak bisa mempercayai pendapatnya tentang ekonomi karena dia bukan lulusan sarjana..."></textarea>
+            <button onclick="analyzeArgument()">Analisis Sekarang</button>
+            <button onclick="clearText()" style="background: #95a5a6; margin-left: 10px;">Hapus Teks</button>
+        </section>
+
+        <section class="results-section">
+            <h2>Hasil Analisis</h2>
+            <div class="info-box">
+                Aplikasi ini memeriksa 10 jenis kesesatan logika umum. Hasil akan muncul di bawah.
+            </div>
+            <div id="results" class="results-container">
+                <div class="no-fallacy">Masukkan teks dan klik "Analisis Sekarang" untuk memulai</div>
+            </div>
+        </section>
+    </div>
+
+    <footer>
+        &copy; 2023 Pemeriksa Kesesatan Logika - Alat Edukasi Critical Thinking
+    </footer>
+
+    <script>
+        // Database Fallacy
+        const fallacyDatabase = [
+            {
+                name: "Ad Hominem",
+                keywords: ["bodoh", "dungu", "gila", "hypocrite", "munafik", "tidak sekolah", "bukan sarjana", "tidak berpendidikan", "orang awam"],
+                description: "Menyerang karakter atau sifat personal lawan bicara, bukan argumennya.",
+                example: "Jangan dengarkan pendapatnya tentang lingkungan, dia kan pernah bercerai."
+            },
+            {
+                name: "Straw Man",
+                keywords: ["berarti anda bilang", "jadi menurut anda", "itu sama saja dengan", "artinya kamu", "maksud kamu"],
+                description: "Menyederhanakan, melebih-lebihkan, atau memelintir argumen lawan menjadi versi yang lemah dan mudah diserang.",
+                example: "Argumen: 'Kita perlu mereformasi polisi.' Straw Man: 'Jadi kamu mau membubarkan kepolisian dan membuat kekacauan?'"
+            },
+            {
+                name: "False Cause (Post Hoc)",
+                keywords: ["setelah itu", "maka karena itu", "terbukti menyebabkan", "akibatnya", "penyebabnya"],
+                description: "Mengasumsikan bahwa karena peristiwa A terjadi sebelum peristiwa B, maka A pastilah penyebab B.",
+                example: "Saya memakai baju merah dan tim saya menang. Jadi, baju merah ini membawa keberuntungan."
+            },
+            {
+                name: "False Dilemma",
+                keywords: ["kalau tidak", "harus salah satu", "pilih saja", "antara ini atau itu", "tidak ada pilihan lain"],
+                description: "Hanya menyajikan dua pilihan ekstrem seolah-olah itulah satu-satunya opsi.",
+                example: "Kalau kamu tidak bersama kami, berarti kamu musuh kami."
+            },
+            {
+                name: "Slippery Slope",
+                keywords: ["nanti akan", "lambat laun", "ujung-ujungnya", "pasti berakhir", "berakibat"],
+                description: "Berargumen bahwa suatu tindakan kecil akan memicu rangkaian peristiwa yang berujung pada konsekuensi besar yang buruk.",
+                example: "Jika kita melegalkan ganja untuk medis, selanjutnya orang akan minta ganja untuk rekreasi, lalu kecanduan narkoba akan merajalela."
+            },
+            {
+                name: "Appeal to Emotion",
+                keywords: ["demi anak cucu", "masa depan bangsa", "cinta tanah air", "kasihan", "takutlah", "demi Tuhan"],
+                description: "Membujuk orang dengan memanfaatkan emosi (takut, kasihan, marah, kebanggaan) alih-alih fakta.",
+                example: "Dukunglah produk lokal ini jika kamu mencintai tanah airmu!"
+            },
+            {
+                name: "Hasty Generalization",
+                keywords: ["semua orang", "selalu", "tidak pernah", "setiap kali", "semuanya", "semua pihak"],
+                description: "Menarik kesimpulan umum berdasarkan sampel yang terlalu kecil atau tidak representatif.",
+                example: "Saya bertemu tiga orang dari kota X dan mereka semuanya kasar. Jadi, pasti semua orang di kota X itu kasar."
+            },
+            {
+                name: "Tu Quoque",
+                keywords: ["kamu juga", "dulu juga", "sama saja", "hiperkrit", "munafik"],
+                description: "Membenarkan tindakan salah sendiri dengan alasan orang lain juga melakukannya.",
+                example: "Kenapa kamu marah saya nyontek? Kamu dulu juga pernah nyontek kok!"
+            },
+            {
+                name: "Appeal to Authority",
+                keywords: ["katanya pakar", "menurut ahli", "para ilmuwan", "profesor berkata", "dr. tersebut"],
+                description: "Menggunakan otoritas sebagai kebenaran mutlak tanpa bukti pendukung.",
+                example: "Produk ini pasti bagus karena diendorse oleh artis terkenal."
+            },
+            {
+                name: "Circular Reasoning",
+                keywords: ["memang sudah seharusnya", "karena begitulah", "sudah terbukti dengan sendirinya"],
+                description: "Kesimpulan dari argumen sama dengan premisnya. Argumen berputar-putar tanpa alasan yang sesungguhnya.",
+                example: "Alkitab adalah firman Tuhan karena di dalamnya tertulis bahwa itu adalah firman Tuhan."
+            }
+        ];
+
+        function checkForFallacies(text) {
+            const detectedFallacies = [];
+            const lowerCaseText = text.toLowerCase();
+
+            fallacyDatabase.forEach(fallacy => {
+                const hasKeyword = fallacy.keywords.some(keyword => 
+                    lowerCaseText.includes(keyword.toLowerCase())
+                );
+
+                // Juga cek dengan regex untuk pola tertentu
+                let regexPatterns = [];
+                
+                if (fallacy.name === "Straw Man") {
+                    regexPatterns = [
+                        /berarti (kamu|anda|kalian) (bilang|maksud|ingin)/gi,
+                        /jadi (menurut|dengan) (kamu|anda)/gi
+                    ];
+                }
+                
+                if (fallacy.name === "False Cause") {
+                    regexPatterns = [
+                        /setelah .* (lalu|maka|kemudian) .*/gi
+                    ];
+                }
+                
+                const hasRegexMatch = regexPatterns.some(pattern => pattern.test(lowerCaseText));
+
+                if (hasKeyword || hasRegexMatch) {
+                    // Hitung skor kecocokan (sederhana)
+                    let score = 0;
+                    fallacy.keywords.forEach(keyword => {
+                        const regex = new RegExp(keyword, 'gi');
+                        const matches = lowerCaseText.match(regex);
+                        if (matches) {
+                            score += matches.length;
+                        }
+                    });
+                    
+                    detectedFallacies.push({
+                        ...fallacy,
+                        score: score
+                    });
+                }
+            });
+
+            // Urutkan berdasarkan skor tertinggi
+            detectedFallacies.sort((a, b) => b.score - a.score);
+            
+            return detectedFallacies;
+        }
+
+        function analyzeArgument() {
+            const userInput = document.getElementById('userArgument').value;
+            const resultsContainer = document.getElementById('results');
+
+            if (!userInput.trim()) {
+                resultsContainer.innerHTML = '<div class="no-fallacy" style="color:#e74c3c;">Silakan masukkan teks terlebih dahulu!</div>';
+                return;
+            }
+
+            const detected = checkForFallacies(userInput);
+
+            resultsContainer.innerHTML = '';
+
+            if (detected.length === 0) {
+                resultsContainer.innerHTML = `
+                    <div class="no-fallacy">
+                        ✅ Tidak terdeteksi pola fallacy yang jelas.<br><br>
+                        <small>Namun, ini tidak menjamin argumen tersebut valid. Periksa konteks dan struktur logika secara manual.</small>
+                    </div>`;
+            } else {
+                resultsContainer.innerHTML = `<div class="fallacy-count">Ditemukan ${detected.length} kemungkinan kesesatan logika</div>`;
+                
+                detected.forEach(fallacy => {
+                    const confidence = fallacy.score > 3 ? "Tinggi" : fallacy.score > 1 ? "Sedang" : "Rendah";
+                    const color = fallacy.score > 3 ? "#e74c3c" : fallacy.score > 1 ? "#f39c12" : "#f1c40f";
+                    
+                    resultsContainer.innerHTML += `
+                        <div class="fallacy-item" style="border-left-color: ${color}">
+                            <div class="fallacy-name">${fallacy.name} <span style="font-size:0.8rem; background:${color}; color:white; padding:2px 8px; border-radius:10px;">Kecocokan: ${confidence}</span></div>
+                            <div class="fallacy-desc">${fallacy.description}</div>
+                            <div class="fallacy-example"><strong>Contoh:</strong> ${fallacy.example}</div>
+                        </div>
+                    `;
+                });
+            }
+        }
+
+        function clearText() {
+            document.getElementById('userArgument').value = '';
+            document.getElementById('results').innerHTML = '<div class="no-fallacy">Masukkan teks dan klik "Analisis Sekarang" untuk memulai</div>';
+        }
+
+        // Tambahkan event listener untuk Enter key
+        document.getElementById('userArgument').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' && e.ctrlKey) {
+                analyzeArgument();
+            }
+        });
+    </script>
+</body>
+</html>
